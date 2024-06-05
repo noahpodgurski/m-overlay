@@ -6,6 +6,8 @@ SKIN.PanelBackground = color(200, 200, 200)
 SKIN.PanelBorder = color(165, 165, 165)
 SKIN.PanelFocused = color(0, 162, 232)
 
+SKIN.SubPanelBackground = color(215, 215, 215)
+
 SKIN.FrameBorder = color(100, 100, 100)
 SKIN.FrameControlBar = color(225, 225, 225)
 SKIN.FrameFocusedControlBar = color(0, 162, 232)
@@ -30,6 +32,15 @@ SKIN.CheckboxOff = color(200, 200, 200)
 SKIN.CheckboxOn = color(0, 162, 232)
 
 SKIN.TabActiveColor = color(0, 0, 0, 75)
+
+SKIN.LabelTextColor = color(0, 0, 0)
+SKIN.LabelShadowColor = color(100, 100, 100, 100)
+
+SKIN.ToolTipTitleColor = color(0, 178, 255)
+SKIN.ToolTipTitleShadowColor = color(100, 100, 100, 100)
+
+SKIN.ToolTipBodyColor = color(0, 0, 0)
+SKIN.ToolTipBodyShadowColor = color(100, 100, 100, 100)
 
 SKIN.CheckImage = graphics.newImage("textures/gui/checkmark.png")
 
@@ -213,4 +224,27 @@ end
 function SKIN:InitHorizontalSelect(panel)
 	panel:SetBGColor(self.PanelBackground)
 	panel:SetBorderColor(self.PanelBorder)
+end
+
+function SKIN:InitLabel(label)
+	label:SetTextColor(self.LabelTextColor)
+	label:SetShadowColor(self.LabelShadowColor)
+end
+
+function SKIN:InitSubPanel(panel)
+	panel:SetBGColor(self.SubPanelBackground)
+end
+
+function SKIN:InitTooltip(tooltip)
+	tooltip:SetTooltipColor(self.SubPanelBackground)
+end
+
+function SKIN:InitTooltipTitle(title)
+	title:SetShadowColor(self.ToolTipTitleShadowColor)
+	title:SetTextColor(self.ToolTipTitleColor)
+end
+
+function SKIN:InitTooltipBody(body)
+	body:SetShadowColor(self.ToolTipBodyShadowColor)
+	body:SetTextColor(self.ToolTipBodyColor)
 end

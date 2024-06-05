@@ -2,15 +2,19 @@ local PANEL = class.create("BasePanel")
 
 require("extensions.table")
 
+local log = require("log")
+
 PANEL:ACCESSOR("Interacted", "m_bInteracted", false)
 PANEL:ACCESSOR("Hovered", "m_bHovered", false)
 PANEL:ACCESSOR("Visible", "m_bVisible", true)
 PANEL:ACCESSOR("Focusable", "m_bFocusable", true)
 PANEL:ACCESSOR("Validated", "m_bValidated", false)
+PANEL:ACCESSOR("AppliedSkin", "m_bAppliedSkin", false)
+PANEL:ACCESSOR("Scissor", "m_bScissor", true)
 
 function PANEL:BasePanel()
+	--self.m_tChildren = setmetatable({}, {__mode = "v"})
 	self.m_tChildren = {}
-	self.m_tOrphans = {}
 	self.m_iWorldPosX = 0
 	self.m_iWorldPosY = 0
 	self.m_fScaleX = 1
@@ -21,7 +25,6 @@ function PANEL:BasePanel()
 	self.m_iHeight = 24
 	self.m_pParent = nil
 	self.m_iZPos = 0
-	self.m_bScissorEnabled = true
 	self.m_bOrphaned = false
 	self.m_bDeleted = false
 	self.m_iDock = DOCK_NONE
@@ -31,7 +34,8 @@ function PANEL:BasePanel()
 end
 
 function PANEL:InheritMethods(panel)
-	for name, value in pairs(panel) do
+	local pclass = panel:getClass()
+	for name, value in pairs(pclass) do
 		if type(value) == "function" and not self[name] then
 			self[name] = function(this, ...)
 				return value(panel, ...)
@@ -41,11 +45,11 @@ function PANEL:InheritMethods(panel)
 end
 
 function PANEL:GetClassName()
-	return self.__classname
+	return self:getClass():getName()
 end
 
 function PANEL:__tostring()
-	return ("Panel[%q]"):format(self.__classname)
+	return ("Panel[%q]"):format(self:GetClassName())
 end
 
 function PANEL:GetConfig()
@@ -190,16 +194,23 @@ function PANEL:GetZPos()
 end
 
 function PANEL:CallAll(func, ...)
-	if not self:IsVisible() then return end
-	self[ func ](self, ...)
 	for _,child in ipairs(self.m_tChildren) do
+		child[func](child, ...)
 		child:CallAll(func, ...)
+	end
+end
+
+function PANEL:CallAllVisible(func, ...)
+	if not self:IsVisible() then return end
+	self[func](self, ...)
+	for _,child in ipairs(self.m_tChildren) do
+		child:CallAllVisible(func, ...)
 	end
 end
 
 function PANEL:CallSelfAndParents(func, ...)
 	if not self:IsVisible() then return end
-	if self[ func ](self, ...) then return end
+	if self[func](self, ...) then return end
 	local parent = self.m_pParent
 	if not parent then return end
 	parent:CallSelfAndParents(func, ...)
@@ -210,7 +221,6 @@ function PANEL:Remove()
 	if parent then
 		parent:OnChildRemoved(self)
 	end
-
 	self.m_bDeleted = true
 	self:OnRemoved()
 	self:Clear()
@@ -257,6 +267,7 @@ function PANEL:CleanupOrphans()
 	for key, child in reversedipairs(self.m_tChildren) do
 		child:CleanupOrphans()
 		if child.m_bOrphaned then
+			log.warn("[GUI] %s is now an orphan and will continue to remain in memory", child)
 			table.remove(self.m_tChildren, key)
 		end
 	end
@@ -268,7 +279,9 @@ function PANEL:CleanupDeleted()
 		child:CleanupDeleted()
 		if child.m_bDeleted then
 			didDelete = true
+
 			table.remove(self.m_tChildren, key)
+			child.m_pParent = nil
 			child = nil
 		end
 	end
@@ -278,14 +291,14 @@ function PANEL:CleanupDeleted()
 end
 
 function PANEL:SetParent(parent)
-	if self.m_pParent then
-		self:MarkAsOrphan()
-	end
 	self.m_pParent = parent
 	if parent then
 		table.insert(parent.m_tChildren, self)
-		parent:OnChildAdded(self)
 		self:SetZPos(#parent.m_tChildren)
+		parent:OnChildAdded(self)
+	else
+		-- No parent? Mark as an orphan for abandonment
+		self:MarkAsOrphan()
 	end
 end
 
@@ -340,7 +353,6 @@ end
 
 function PANEL:SizeToChildren(doWidth, doHeight)
 	local all = doWidth == nil and doHeight == nil
-	local w,h = 0, 0
 	local padding = self:GetDockPadding()
 
 	local lw, lh = 0, 0
@@ -352,17 +364,16 @@ function PANEL:SizeToChildren(doWidth, doHeight)
 			local cw, ch = child:GetPixelSize()
 
 			-- Position + size + margins = maximum bounds
-			cw = x + cw + margin.left + margin.right
-			ch = y + ch + margin.top + margin.bottom
+			cw = margin.left + x + cw
+			ch = margin.top + y + ch
 
 			-- Update the largest widths and heights
 			if cw > lw then lw = cw end
 			if ch > lh then lh = ch end
 		end
 	end
-	-- Use SetWidth/SetHeight so we invalidate the layout..
-	if all or doWidth then self:SetWidth(w + lw) end
-	if all or doHeight then self:SetHeight(h + lh) end
+	if all or doWidth then self.m_iWidth = lw + padding.right end
+	if all or doHeight then self.m_iHeight = lh + padding.bottom end
 end
 
 function PANEL:Add(class)
@@ -502,7 +513,7 @@ function PANEL:Render()
 	local sx, sy = x, y
 	local sw, sh = w, h
 
-	while self.m_bScissorEnabled and parent do
+	while self.m_bScissor and parent do
 		-- If we have a parent, fit the scissor to fit inside their bounds
 		local px, py = parent:LocalToWorld(0, 0)
 		local pw, ph = parent:GetSize()
@@ -573,7 +584,14 @@ function PANEL:Render()
 end
 
 function PANEL:DisableScissor()
-	self.m_bScissorEnabled = false
+	self.m_bScissor = false
+end
+
+function PANEL:ApplySkin()
+	if not self.m_bAppliedSkin then
+		self.m_bAppliedSkin = true
+		self:Skin()
+	end
 end
 
 function PANEL:ValidateLayout()
@@ -990,4 +1008,8 @@ end
 
 function PANEL:OnQueryTooltip()
 	-- Called when the user has hovered over the panel for more than a second
+end
+
+function PANEL:Skin()
+	
 end

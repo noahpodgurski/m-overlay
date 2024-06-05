@@ -11,7 +11,7 @@
   - Installer: [m-overlay-x64-installer.exe](https://github.com/bkacjios/m-overlay/releases/latest/download/m-overlay-x64-installer.exe)
   - Portable: [m-overlay-x64-portable.zip](https://github.com/bkacjios/m-overlay/releases/latest/download/m-overlay-x64-portable.zip)
 * Linux ([LÖVE 11.3](https://love2d.org/) - x64)
-  - Love2D: [m-overlay-x64.love](https://github.com/bkacjios/m-overlay/releases/latest/download/m-overlay-x64.love)
+  - Love2D: [m-overlay-x64-installer.love](https://github.com/bkacjios/m-overlay/releases/latest/download/m-overlay-x64-installer.love)
 * macOS
   - [Currently unsupported and probably never will be](https://github.com/bkacjios/m-overlay/issues/97)
 
@@ -79,7 +79,7 @@
 * Pikmin (NTSC-U v1.0, NTSC-U v1.1)
 * Pikmin 2 (NTSC-U v1.0, DEMO v1.0)
   - [Pikmin 251](https://www.youtube.com/watch?v=7ylu9ogW88w)
-* Pitfall The Lost Expedition (NTSC-U v1.0, FR v1.0)
+* Pitfall The Lost Expedition (NTSC-U v1.0, FR v1.0, PAL v1.0, DE v1.0)
 * Super Monkey Ball (NTSC-U v1.0, NTSC-J v1.2, PAL v1.0)
 * Super Monkey Ball 2 (NTSC-U v1.0)
   - Super Monkey Ball Gaiden
@@ -95,7 +95,9 @@
 * The SpongeBob SquarePants Movie (NTSC-U v1.1, PAL v1.0)
 * Super Mario Strikers (NTSC-U v1.0)
 * TimeSplitters 2 (NTSC-U v1.0)
+* Naruto - Clash of Ninja Revolution 3 (NTSC-U v1.0, PAL v1.0)
 * Naruto - Gekitou Ninja Taisen! 4 (NTSC-J v1.0)
+  - [Naruto: Super Clash of Ninja 4](https://gnt4.online/scon4/)
 * Need for Speed Underground 1 (NTSC-U v1.0)
 * Need for Speed Underground 2 (NTSC-U v1.0)
 
@@ -105,6 +107,7 @@
   - [Project M](https://en.wikipedia.org/wiki/Project_M)
   - [P+](https://projectplusgame.com/)
 * Mario Kart Wii (NTSC-U v1.0)
+* Pitfall The Big Adventure (NTSC-U v1.0, PAL v1.0)
 * The Legend of Zelda: Twilight Princess (NTSC-U v1.0)
 
 ### Supported VC games:

@@ -5,10 +5,8 @@ local log = require("log")
 local REQUESTS = {}
 local THREAD_POOL_SIZE = 3
 
--- create a pool of threads to allow up to 3 connections to happen concurrently
-for i=1,THREAD_POOL_SIZE do
-	love.thread.newThread("modules/web/thread.lua"):start()
-end
+local THREAD = love.thread.newThread("modules/web/thread.lua")
+THREAD:start()
 
 -- these two channels are used to send requests and progress updates back and forth
 local requests_channel = love.thread.getChannel("web-requests")
@@ -62,6 +60,10 @@ function web.update()
 		end
 		REQUESTS[id] = nil
 	end
+end
+
+function web.close()
+	requests_channel:push(false) -- false ends the thread loop
 end
 
 return web
