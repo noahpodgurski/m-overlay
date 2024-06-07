@@ -1,6 +1,6 @@
 # m-overlay with live ranked stats (forked from [m-overlay](https://github.com/bkacjios/m-overlay))
 
-![M'Overlay in use](https://i.imgur.com/VZWta8H.gif)
+![M'Overlay in use](./demo.gif)
 
 Ranked stats update at the start of each game
 
