@@ -223,13 +223,8 @@ memory.hook("scene.minor", "Slippi Auto Port Switcher", function(minor)
 	if memory.scene.major == SCENE_VS_ONLINE and PANEL_SETTINGS:IsSlippiNetplay() then
 		-- update info:
 		local opponentCode
-		if memory.slippi.local_player.index == 0 then
-			playerCode = memory.slippi.players[1].code
-			opponentCode = memory.slippi.players[2].code
-		else	
-			playerCode = memory.slippi.players[2].code
-			opponentCode = memory.slippi.players[1].code
-		end
+		playerCode = memory.slippi.players[memory.slippi.local_player.index+1].code
+		opponentCode = memory.slippi.players[memory.slippi.remote_player.index+1].code
 		
 		if PANEL_SETTINGS:IsShowRanksEnabled() then
 			grabUserStats(playerCode, false)

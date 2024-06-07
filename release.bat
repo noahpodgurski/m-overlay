@@ -31,8 +31,11 @@ SET LAUNCHER_DIR=.\launcher
 SET RELEASES_DIR=.\releases
 SET TOOLS_DIR=.\tools
 
-if not exist %BUILD_DIR% mkdir %BUILD_DIR%
-if not exist %BUILD_OUTPUT_DIR% mkdir %BUILD_OUTPUT_DIR%
+REM Clean build directory
+echo Cleaning build directory...
+if exist %BUILD_DIR% rmdir /S /Q %BUILD_DIR%
+mkdir %BUILD_DIR%
+mkdir %BUILD_OUTPUT_DIR%
 
 SET BRANCH=dirty
 SET COMMIT=1
@@ -75,8 +78,6 @@ echo Zipping files in %SOURCE_DIR% into %APPLICATION_LOVE%
 
 if exist %APPLICATION_LOVE% del %APPLICATION_LOVE%
 
-REM timeout /t 3 /nobreak
-
 7z a -tzip -mx=9 -xr!*.git -xr!*.dll %APPLICATION_LOVE% "%SOURCE_DIR%\*"
 7z a -tzip -mx=9 -xr!*.git -xr!*.dll %LAUNCHER_LOVE% "%LAUNCHER_DIR%\*"
 
@@ -89,8 +90,8 @@ xcopy /d %LOVE_DIR%\*.dll %BUILD_OUTPUT_DIR% /y
 xcopy /d %SOURCE_DIR%\*.dll %BUILD_OUTPUT_DIR% /y
 del %BUILD_OUTPUT_DIR%\sqlite3.dll
 
-echo Copying love.exe %BUILD_DIR%
-copy /b %LOVE_DIR%\love.exe+,, %BUILD_DIR%
+echo Copying love.exe to build directory
+copy /b %LOVE_DIR%\love.exe %BUILD_DIR%
 
 echo Customizing love.exe
 rcedit-x64 "%BUILD_DIR%\love.exe" --set-icon "%INSTALLER_DIR%\icon.ico"
@@ -99,10 +100,10 @@ rcedit-x64 "%BUILD_DIR%\love.exe" --set-version-string "FileDescription" "M'Over
 rcedit-x64 "%BUILD_DIR%\love.exe" --set-version-string "InternalName" "%NAME%-%BIT%"
 rcedit-x64 "%BUILD_DIR%\love.exe" --set-version-string "OriginalFilename" "%EXE_NAME%"
 
-REM We have to merge AFTER rcedit, since rcedit destroys the merged data
-echo Merging love.exe + %LAUNCHER_LOVE% into %EXE_PATH%
-copy /b "%BUILD_DIR%\love.exe"+%LAUNCHER_LOVE% %EXE_PATH%
-REM copy /b "%BUILD_DIR%\love.exe"+%APPLICATION_LOVE% %EXE_PATH%
+REM Merging love.exe with application.love
+echo Merging love.exe + %APPLICATION_LOVE% into %EXE_PATH%
+if exist %EXE_PATH% del %EXE_PATH%
+copy /b "%BUILD_DIR%\love.exe"+%APPLICATION_LOVE% %EXE_PATH%
 
 SET PORTABLE_ZIP="%RELEASES_DIR%\%VERSION%\%NAME%-%BIT%-portable.zip"
 

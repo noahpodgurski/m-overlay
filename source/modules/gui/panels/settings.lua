@@ -524,6 +524,7 @@ function PANEL:GetSaveTable()
 		["melee-music-volume"] = self:GetVolume(),
 		["background-color"] = self:GetBackgroundColor():hexString(),
 		["dark-mode"] = self:IsDarkMode(),
+		["slippi-ranked"] = self:IsShowRanksEnabled(),
 	}
 end
 
@@ -762,4 +763,5 @@ function PANEL:LoadSettings()
 	end
 	self.BACKGROUNDCOLOR:SetColor(color(settings["background-color"]))
 	self.ABOUT.DARK:SetToggled(settings["dark-mode"], true)
+	self.SLIPPI.RANKED:SetToggled(settings["slippi-ranked"], true)
 end

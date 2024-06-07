@@ -213,15 +213,17 @@ local function convertJisStr(str)
 	while i <= #str do
 		local c1 = string.sub(str, i, i)
 		local b1 = string.byte(c1)
-
+				
 		if bit.band(b1, 0x80) == 0x80 then
 			local c2 = string.sub(str, i + 1, i + 1)
 			local b2 = string.byte(c2)
 
-			local b16 = bit.bor(bit.lshift(b1, 8), bit.lshift(b2, 0))
+			if b2 ~= nil then
+				local b16 = bit.bor(bit.lshift(b1, 8), bit.lshift(b2, 0))
 
-			if char_replacement_map[b16] then
-				niceStr = niceStr .. char_replacement_map[b16]
+				if char_replacement_map[b16] then
+					niceStr = niceStr .. char_replacement_map[b16]
+				end
 			end
 
 			i = i + 2
